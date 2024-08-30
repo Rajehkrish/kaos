@@ -28,6 +28,8 @@ jobs:
           pip install pytest
 
       - name: Run Tests
+        env:
+          PYTHONPATH: \${{ github.workspace }}
         run: pytest
 
       - name: Build Docker image
@@ -35,19 +37,20 @@ jobs:
 
       - name: Push Docker image to Docker Hub
         run: |
-          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
           docker tag rajeshkrish/public-ip-webapp:latest
           docker push rajeshkrish/public-ip-webapp:latest
 
       - name: Deploy to Kubernetes using Helm
         run: |
-          helm upgrade --install public-ip-webapp ./public-ip-webapp --namespace default
+          helm upgrade --install public-ip-webapp ./public-ip-webapp
 
       - name: Notify Slack
         uses: rtCamp/action-slack-notify@v2.1.0
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: \${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: '#36a64f'
           SLACK_USERNAME: 'GitHub Actions'
           SLACK_CHANNEL: '#github-notification'
-          SLACK_MESSAGE: 'CI Pipeline status: ${{ job.status }}'
+          SLACK_MESSAGE: 'CI Pipeline status: \${{ job.status }}'
+
