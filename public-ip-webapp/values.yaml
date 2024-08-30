@@ -1,0 +1,10 @@
+image:
+  repository: rajeshkrish/public-ip-webapp
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 5000
+
+ingress:
+  enabled: false
